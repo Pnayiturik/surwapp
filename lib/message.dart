@@ -21,13 +21,13 @@ class _MessagesScreenState extends State<MessagesScreen>
     ),
     MessageUser(
       name: 'kenny',
-      lastMessage: 'I’m interested in your listing.',
+      lastMessage: 'I am interested in buying this item.',
       time: '11:20',
       isUnread: false,
     ),
     MessageUser(
       name: 'david',
-      lastMessage: 'Let’s negotiate the price.',
+      lastMessage: 'Let me know when you are available.',
       time: '10:15',
       isUnread: true,
     ),
@@ -58,14 +58,29 @@ class _MessagesScreenState extends State<MessagesScreen>
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false, // This removes the back arrow
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(width: 5),
-            Image.asset(
-              'assets/images/surwa_logo.png',
-              width: 150,
-              height: 80,
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context); // Make logo act as back button
+              },
+              child: Image.asset(
+                'assets/images/surwa_logo.png',
+                width: 100,
+                height: 100,
+              ),
             ),
+            Text(
+              'Messages',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: 100), // This balances the row with the logo
           ],
         ),
         actions: [

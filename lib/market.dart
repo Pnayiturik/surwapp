@@ -7,8 +7,21 @@ class MarketScreen extends StatefulWidget {
   _MarketScreenState createState() => _MarketScreenState();
 }
 
-class _MarketScreenState extends State<MarketScreen> {
+class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderStateMixin {
   int _selectedIndex = 1; // Set to Market index
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   void _onBottomNavTap(int index) {
     setState(() {
@@ -21,7 +34,7 @@ class _MarketScreenState extends State<MarketScreen> {
         Navigator.pushNamed(context, '/feeds');
         break;
       case 1:
-        Navigator.pushNamed(context, '/market');
+        // Already on market screen
         break;
       case 2:
         Navigator.pushNamed(context, '/messages');
@@ -45,43 +58,71 @@ class _MarketScreenState extends State<MarketScreen> {
   final List<Map<String, dynamic>> _popularItems = [
     {
       'image': 'images/basket.jpg',
-      'name': 'Handmade basket',
+      'name': 'Handmade Basket',
+      'description': 'Traditional Rwandan woven basket',
       'price': '5,000 Frw',
+      'originalPrice': '5,000 Frw',
+      'discount': 0,
     },
     {
       'image': 'images/kitenge.jpg',
-      'name': 'Igitenge bag',
+      'name': 'Igitenge Bag',
+      'description': 'Colorful African fabric bag',
       'price': '10,000 Frw',
+      'originalPrice': '10,000 Frw',
+      'discount': 0,
     },
+    {
+      'image': 'images/woodcarving.jpg',
+      'name': 'Wooden Sculpture',
+      'description': 'Hand-carved Imigongo art piece',
+      'price': '15,000 Frw',
+      'originalPrice': '15,000 Frw',
+      'discount': 0,
+    },
+    {
+      'image': 'images/jewelry.jpg',
+      'name': 'Beaded Necklace',
+      'description': 'Traditional Rwandan jewelry',
+      'price': '7,500 Frw',
+      'originalPrice': '7,500 Frw',
+      'discount': 0,
+    },
+  ];
+
+  // List of hot deal items (with discounts)
+  final List<Map<String, dynamic>> _hotDealItems = [
     {
       'image': 'images/basket.jpg',
-      'name': 'Handmade basket',
-      'price': '5,000 Frw',
+      'name': 'Handmade Basket',
+      'description': 'Traditional Rwandan woven basket',
+      'price': '4,000 Frw',
+      'originalPrice': '5,000 Frw',
+      'discount': 20,
     },
     {
       'image': 'images/kitenge.jpg',
-      'name': 'Igitenge bag',
-      'price': '10,000 Frw',
+      'name': 'Igitenge Bag',
+      'description': 'Colorful African fabric bag',
+      'price': '8,000 Frw',
+      'originalPrice': '10,000 Frw',
+      'discount': 20,
     },
     {
-      'image': 'images/basket.jpg',
-      'name': 'Handmade basket',
-      'price': '5,000 Frw',
+      'image': 'images/woodcarving.jpg',
+      'name': 'Wooden Sculpture',
+      'description': 'Hand-carved Imigongo art piece',
+      'price': '12,000 Frw',
+      'originalPrice': '15,000 Frw',
+      'discount': 20,
     },
     {
-      'image': 'images/kitenge.jpg',
-      'name': 'Igitenge bag',
-      'price': '10,000 Frw',
-    },
-    {
-      'image': 'images/basket.jpg',
-      'name': 'Handmade basket',
-      'price': '5,000 Frw',
-    },
-    {
-      'image': 'images/kitenge.jpg',
-      'name': 'Igitenge bag',
-      'price': '10,000 Frw',
+      'image': 'images/jewelry.jpg',
+      'name': 'Beaded Necklace',
+      'description': 'Traditional Rwandan jewelry',
+      'price': '6,000 Frw',
+      'originalPrice': '7,500 Frw',
+      'discount': 20,
     },
   ];
 
@@ -160,10 +201,11 @@ class _MarketScreenState extends State<MarketScreen> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Image.asset(
-                          'assets/images/patrickprofile.jpg', // Replace with your image asset
-                          width: 100,
-                          height: 100,
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundImage: AssetImage(
+                            'assets/images/patrickprofile.jpg',
+                          ),
                         ),
                       ),
                     ],
@@ -175,142 +217,111 @@ class _MarketScreenState extends State<MarketScreen> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children:
-                        _categories.map((category) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
+                    children: _categories.map((category) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.green[200],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                _getIconForCategory(category['label']!),
+                                color: Colors.green[800],
+                              ),
                             ),
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green[200],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Icon(
-                                    _getIconForCategory(category['label']!),
-                                    color: Colors.green[800],
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  category['label']!,
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              ],
+                            SizedBox(height: 8),
+                            Text(
+                              category['label']!,
+                              style: TextStyle(fontSize: 12),
                             ),
-                          );
-                        }).toList(),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
                 SizedBox(height: 16),
 
                 // Popular Items and Hot Deals Tabs
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.yellow,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Popular items',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
                       ),
                     ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        'Hot deals',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: UnderlineTabIndicator(
+                      borderSide: BorderSide(
+                        width: 3.0,
+                        color: Colors.green,
                       ),
+                      insets: EdgeInsets.symmetric(horizontal: 16.0),
                     ),
-                  ],
+                    labelColor: Colors.green,
+                    unselectedLabelColor: Colors.grey,
+                    labelStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    unselectedLabelStyle: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                    ),
+                    tabs: [
+                      Tab(text: 'Popular Items'),
+                      Tab(text: 'Hot Deals'),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 16),
 
-                // Popular Items Grid
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.8,
+                // TabBarView for the content
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      // Popular Items Tab
+                      GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.75,
+                        ),
+                        itemCount: _popularItems.length,
+                        itemBuilder: (context, index) {
+                          final item = _popularItems[index];
+                          return _buildProductCard(item);
+                        },
+                      ),
+
+                      // Hot Deals Tab
+                      GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.75,
+                        ),
+                        itemCount: _hotDealItems.length,
+                        itemBuilder: (context, index) {
+                          final item = _hotDealItems[index];
+                          return _buildProductCard(item, isHotDeal: true);
+                        },
+                      ),
+                    ],
                   ),
-                  itemCount: _popularItems.length,
-                  itemBuilder: (context, index) {
-                    final item = _popularItems[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Center(
-                              child: Image.asset(
-                                'assets/${item['image']}', // Replace with your image asset
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item['name'],
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      item['price'],
-                                      style: TextStyle(color: Colors.green),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green[100],
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Icon(
-                                        Icons.shopping_cart,
-                                        size: 16,
-                                        color: Colors.green[800],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
                 ),
               ],
             ),
@@ -331,6 +342,121 @@ class _MarketScreenState extends State<MarketScreen> {
           ),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductCard(Map<String, dynamic> item, {bool isHotDeal = false}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Stack(
+              children: [
+                Center(
+                  child: Image.asset(
+                    'assets/${item['image']}',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                if (isHotDeal)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${item['discount']}% OFF',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['name'],
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4),
+                Text(
+                  item['description'],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4),
+                if (isHotDeal)
+                  Text(
+                    item['originalPrice'],
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      item['price'],
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: isHotDeal ? FontWeight.bold : FontWeight.normal,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.shopping_cart,
+                        size: 16,
+                        color: Colors.green[800],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

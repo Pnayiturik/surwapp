@@ -10,6 +10,29 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _selectedIndex = 3; // Set to Account index since this is the profile page
+
+  void _onBottomNavTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Handle navigation based on the selected index using named routes
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, '/feeds');
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/market');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/messages');
+        break;
+      case 3:
+        // Already on profile screen
+        break;
+    }
+  }
 
   @override
   void initState() {
@@ -65,9 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               children: [
                 CircleAvatar(
                   radius: 40,
-                  // Use NetworkImage or File Image if from a file
                   backgroundImage: AssetImage('assets/images/patrickprofile.jpg'),
-                  // Add error handling for image loading
                   onBackgroundImageError: (exception, stackTrace) {
                     print('Error loading image: $exception');
                   },
@@ -160,6 +181,22 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ],
             ),
           ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        onTap: _onBottomNavTap,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Feed'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_basket),
+            label: 'Market',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
         ],
       ),
     );
