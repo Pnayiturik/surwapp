@@ -1,4 +1,3 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'splash.dart';
 import 'login.dart';
@@ -8,6 +7,8 @@ import 'profile.dart';
 import 'market.dart';
 import 'dashboard.dart';
 import 'feeds.dart';
+import 'message.dart';
+import 'chat_screen.dart';
 
 void main() {
   runApp(const SurwaApp());
@@ -57,7 +58,9 @@ class SurwaApp extends StatelessWidget {
         '/profile': (context) => ProfileScreen(),
         '/market': (context) => MarketScreen(),
         '/dashboard': (context) => DashboardScreen(),
-        '/feeds':  (context) => FeedScreen(),
+        '/feeds': (context) => FeedScreen(),
+        '/messages': (context) => MessagesScreen(),
+        
       },
     );
   }

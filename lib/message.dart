@@ -1,16 +1,55 @@
 import 'package:flutter/material.dart';
+import 'chat_screen.dart';
 
-class MessagesScreen extends StatelessWidget {
-  final List<MessageItem> messages = List.generate(
-    6,
-        (index) => MessageItem(
-      senderName: 'John Doe',
-      messagePreview: 'Can you tell me more info about this product.........',
+class MessagesScreen extends StatefulWidget {
+  const MessagesScreen({Key? key}) : super(key: key);
+
+  @override
+  _MessagesScreenState createState() => _MessagesScreenState();
+}
+
+class _MessagesScreenState extends State<MessagesScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  final List<MessageUser> allUsers = [
+    MessageUser(
+      name: 'nagasaro',
+      lastMessage: 'Can you tell me more info about this product?',
       time: '12:45',
+      isUnread: true,
     ),
-  );
+    MessageUser(
+      name: 'kenny',
+      lastMessage: 'I’m interested in your listing.',
+      time: '11:20',
+      isUnread: false,
+    ),
+    MessageUser(
+      name: 'david',
+      lastMessage: 'Let’s negotiate the price.',
+      time: '10:15',
+      isUnread: true,
+    ),
+    MessageUser(
+      name: 'Stella',
+      lastMessage: 'Thanks for the details.',
+      time: '09:50',
+      isUnread: false,
+    ),
+  ];
 
-  MessagesScreen({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,137 +60,102 @@ class MessagesScreen extends StatelessWidget {
         elevation: 0,
         title: Row(
           children: [
-            Text(
-              'Surwa',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.black,
-              ),
+            SizedBox(width: 5),
+            Image.asset(
+              'assets/images/surwa_logo.png',
+              width: 150,
+              height: 80,
             ),
-            Image.asset('assets/logo.png', height: 24),
           ],
         ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(48),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Color(0xFF5CB8A7),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search, color: Colors.black),
+            onPressed: () {},
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.green,
+          tabs: [
+            Tab(text: 'All'),
+            Tab(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Unread'),
+                  SizedBox(width: 4),
+                  CircleAvatar(
+                    radius: 10,
+                    backgroundColor: Colors.red,
+                    child: Text(
+                      '${allUsers.where((user) => user.isUnread).length}',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
-                  child: Text('Messages'),
-                ),
-                IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {},
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
-      body: Column(
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            height: 50,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.green,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'All',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Unread',
-                          style: TextStyle(
-                            color: Colors.grey,
-                          ),
-                        ),
-                        SizedBox(width: 4),
-                        Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            '1',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return MessageListItem(message: messages[index]);
-              },
-            ),
-          ),
+          buildMessageList(allUsers), // All messages
+          buildMessageList(
+            allUsers.where((user) => user.isUnread).toList(),
+          ), // Unread messages
         ],
       ),
     );
   }
+
+  Widget buildMessageList(List<MessageUser> users) {
+    return ListView.builder(
+      itemCount: users.length,
+      itemBuilder: (context, index) {
+        return MessageUserTile(
+          user: users[index],
+          onTap: () {
+            setState(() {
+              users[index].isUnread = false; // Mark as read when opened
+            });
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(user: users[index]),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
-class MessageItem {
-  final String senderName;
-  final String messagePreview;
+class MessageUser {
+  final String name;
+  final String lastMessage;
   final String time;
+  bool isUnread;
 
-  MessageItem({
-    required this.senderName,
-    required this.messagePreview,
+  MessageUser({
+    required this.name,
+    required this.lastMessage,
     required this.time,
+    this.isUnread = false,
   });
 }
 
-class MessageListItem extends StatelessWidget {
-  final MessageItem message;
+class MessageUserTile extends StatelessWidget {
+  final MessageUser user;
+  final VoidCallback onTap;
 
-  const MessageListItem({
-    super.key,
-    required this.message,
-  });
+  const MessageUserTile({Key? key, required this.user, required this.onTap})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -161,21 +165,44 @@ class MessageListItem extends StatelessWidget {
         child: Icon(Icons.person_outline, color: Colors.deepPurple),
       ),
       title: Text(
-        message.senderName,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        user.name,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: user.isUnread ? Colors.black : Colors.grey,
+        ),
       ),
       subtitle: Text(
-        message.messagePreview,
+        user.lastMessage,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: user.isUnread ? Colors.black : Colors.grey,
+          fontWeight: user.isUnread ? FontWeight.bold : FontWeight.normal,
+        ),
       ),
-      trailing: Text(
-        message.time,
-        style: TextStyle(color: Colors.grey),
+      trailing: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            user.time,
+            style: TextStyle(
+              color: user.isUnread ? Colors.green : Colors.grey,
+              fontWeight: user.isUnread ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          if (user.isUnread)
+            CircleAvatar(
+              radius: 8,
+              backgroundColor: Colors.green,
+              child: Text(
+                '1',
+                style: TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+        ],
       ),
-      onTap: () {
-        // Navigate to detailed conversation
-      },
+      onTap: onTap,
     );
   }
 }
