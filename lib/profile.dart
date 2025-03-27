@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:surwaapp/settings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -43,7 +44,15 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to SettingsScreen when settings icon is pressed
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+              },
           ),
         ],
       ),
