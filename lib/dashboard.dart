@@ -52,14 +52,10 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.dashboard, size: 100, color: Colors.blue),
-            SizedBox(height: 20),
-            Text(
-              'Welcome to Dashboard',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+            Image.asset(
+              'assets/images/surwa_logo.png', // Make sure to add this image to your assets
+              width: 350, // Adjust width as needed
+              height: 250, // Adjust height as needed
             ),
           ],
         ),
