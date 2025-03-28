@@ -1,8 +1,37 @@
 import 'package:flutter/material.dart';
+import 'shoppingcart.dart';
 
+class ShoppingCartScreen extends StatelessWidget {
+  const ShoppingCartScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+  backgroundColor: Colors.white,
+  elevation: 0,
+  title: Text('Market', style: TextStyle(color: Colors.black)),
+  actions: [
+    IconButton(
+      icon: Icon(Icons.shopping_cart, color: Colors.black),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ShoppingCartScreen()),
+        );
+      },
+    ),
+  ],
+),
+      body: Center(
+        child: Text('Shopping Cart'),
+      ), 
+    );
+  }
+}
+
+// ignore: unused_element
 class MarketScreen extends StatefulWidget {
-  const MarketScreen({super.key});
-
   @override
   _MarketScreenState createState() => _MarketScreenState();
 }
